@@ -2,18 +2,20 @@ import Repository from "../models/Repository";
 import { Request, Response } from 'express';
 import { uuid } from 'uuidv4';
 
+const repositories: Repository[] = [];
+
 class RepositoryController {
 
-    public repositories: Repository[] = [];
+    // public repositories: Repository[];
 
     // constructor() {
-    //     this.repositories = [];
+    //     repositories = [];
     // }
 
     index(request: Request, response: Response) {
     
-        console.log("error: ", this.repositories);
-        return response.json(this.repositories);
+        console.log("error: ", repositories);
+        return response.json(repositories);
     }
 
     create(request: Request, response: Response) {
@@ -22,7 +24,7 @@ class RepositoryController {
 
         const repository = new Repository(id, title, url, techs);
 
-        this.repositories.push(repository);
+        repositories.push(repository);
 
         return response.json(repository);
     }
@@ -31,13 +33,13 @@ class RepositoryController {
         const { id } = request.params;
         const { title, url, techs } = request.body;
 
-        const repositoryIndex = this.repositories.findIndex(repository => repository.id === id);
+        const repositoryIndex = repositories.findIndex(repository => repository.id === id);
 
         if (repositoryIndex < 0 ) {
             return response.status(404).json({ error: 'Repository not found.'})
         }
 
-        const repositoryUpdated = this.repositories[repositoryIndex];
+        const repositoryUpdated = repositories[repositoryIndex];
 
         repositoryUpdated.title = title ? title : repositoryUpdated.title;
         repositoryUpdated.url = url ? url : repositoryUpdated.url;
@@ -49,13 +51,13 @@ class RepositoryController {
     delete(request: Request, response: Response) {
         const { id } = request.params;
 
-        const repositoryIndex = this.repositories.findIndex(repository => repository.id === id);
+        const repositoryIndex = repositories.findIndex(repository => repository.id === id);
     
         if (repositoryIndex < 0 ) {
             return response.status(404).json({ error: 'Repository not found.'})
         }
     
-        this.repositories.splice(repositoryIndex, 1);
+        repositories.splice(repositoryIndex, 1);
     
         return response.status(204).send();
     }
@@ -63,13 +65,13 @@ class RepositoryController {
     like(request: Request, response: Response) {
         const { id } = request.params;
 
-        const repositoryIndex = this.repositories.findIndex(repository => repository.id === id);
+        const repositoryIndex = repositories.findIndex(repository => repository.id === id);
 
         if (repositoryIndex < 0 ) {
             return response.status(404).json({ error: 'Repository not found.'})
         }
 
-        const repositoryLiked = this.repositories[repositoryIndex];
+        const repositoryLiked = repositories[repositoryIndex];
 
         repositoryLiked.like();
 
