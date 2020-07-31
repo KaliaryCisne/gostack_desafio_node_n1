@@ -1,4 +1,4 @@
-import express, { request } from 'express';
+import express, { request, response } from 'express';
 import { uuid } from 'uuidv4';
 
 const app = express();
@@ -60,11 +60,43 @@ app.put('/repositories/:id', (request, response) => {
     }
 
     const repositoryUpdated = repositories[repositoryIndex];
+
     repositoryUpdated.title = title ? title : repositoryUpdated.title;
     repositoryUpdated.url = url ? url : repositoryUpdated.url;
     repositoryUpdated.techs = techs ? techs : repositoryUpdated.techs;
 
     return response.json(repositoryUpdated);
+});
+
+app.post('/repositories/:id/like', (request, response) => {
+    const { id } = request.params;
+
+    const repositoryIndex = repositories.findIndex(repository => repository.id === id);
+
+    if (repositoryIndex < 0 ) {
+        return response.status(404).json({ error: 'Repository not found.'})
+    }
+
+    const repositoryLiked = repositories[repositoryIndex];
+
+    repositoryLiked.like();
+
+    return response.json(repositoryLiked);
+});
+
+
+app.delete('/repositories/:id', (request, response) => {
+    const { id } = request.params;
+
+    const repositoryIndex = repositories.findIndex(repository => repository.id === id);
+
+    if (repositoryIndex < 0 ) {
+        return response.status(404).json({ error: 'Repository not found.'})
+    }
+
+    repositories.splice(repositoryIndex, 1);
+
+    return response.status(204).send();
 });
 
 app.listen(3333, () => {
